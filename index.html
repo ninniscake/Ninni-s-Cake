@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Ninni’s Cake — Panettoni Artigianali 2025</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Lato:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    :root{ --bg:#f7f4ee; --card:#fff; --text:#4e3b2a; --accent:#9e6b40; --accent-2:#d9b899; --border:#eadccf; --shadow:0 10px 26px rgba(0,0,0,.08); }
+    *{box-sizing:border-box;}
+    body{margin:0;font-family:'Lato',sans-serif;background:var(--bg);color:var(--text);}
+    header{text-align:center;padding:36px 16px 10px;}
+    header img{width:140px;display:block;margin:0 auto 8px;}
+    header h1{font-family:'Playfair Display',serif;font-size:1.9rem;color:var(--accent);margin:6px 0 4px;}
+    header p.subtitle{margin:0;color:#7a6652;font-size:.98rem;}
+    main#catalog{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:22px;max-width:1200px;margin:34px auto 80px;padding:0 22px;}
+    .card{background:var(--card);border-radius:14px;overflow:hidden;box-shadow:var(--shadow);display:flex;flex-direction:column;border:1px solid var(--border);transition:transform .22s ease, box-shadow .22s ease;}
+    .card:hover{transform:translateY(-3px);box-shadow:0 14px 30px rgba(0,0,0,.12);}
+    .card img{width:100%;height:210px;object-fit:cover;display:block;}
+    .meta{padding:14px;display:flex;flex-direction:column;gap:8px;}
+    .meta h3{font-family:'Playfair Display',serif;font-size:1.1rem;color:var(--accent);margin:0 0 2px;}
+    .desc{font-size:.92rem;line-height:1.4;color:#5b4a3b;margin:0;white-space:normal;}
+    .price-badge{align-self:flex-start;font-weight:600;font-size:.86rem;padding:2px 10px;border-radius:999px;background:var(--accent-2);color:#3f3126;border:1px solid #e9d2b9;}
+    .controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:4px;}
+    select,input[type="number"]{font-size:.9rem;padding:6px 8px;border:1px solid #ddd;border-radius:8px;background:#fff;}
+    input[type="number"]{width:70px;}
+    .btn{font-size:.9rem;padding:7px 12px;border-radius:8px;border:0;background:var(--accent);color:#fff;font-weight:600;cursor:pointer;transition:filter .18s ease;}
+    .btn:hover{filter:brightness(1.05);}
+    footer{text-align:center;padding:30px 16px;color:#7a6652;background:#f3ede4;border-top:1px solid var(--border);}
+    .cart-fab{position:fixed;right:20px;bottom:20px;z-index:999;background:var(--accent);color:#fff;border-radius:12px;display:flex;align-items:center;gap:8px;padding:10px 12px;box-shadow:0 10px 26px rgba(0,0,0,.22);cursor:pointer;}
+    .cart-fab .count{background:#fff;color:var(--accent);font-weight:700;padding:2px 8px;border-radius:999px;font-size:.85rem;min-width:24px;text-align:center;}
+    .cart-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.4);display:none;z-index:998;}
+    .cart-overlay.open{display:block;}
+    .cart-panel{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);width:720px;max-width:92vw;max-height:88vh;overflow-y:auto;background:#fff;border:1px solid #d8b68d;border-radius:16px;box-shadow:0 16px 40px rgba(0,0,0,0.18);display:none;z-index:999;}
+    .cart-panel.open{display:block;}
+    .cart-head{padding:14px 18px;border-bottom:1px solid #eee;display:flex;justify-content:space-between;align-items:center;}
+    .cart-body{padding:16px 18px;display:flex;flex-direction:column;gap:10px;}
+    .cart-item{display:flex;justify-content:space-between;gap:10px;border-bottom:1px dashed #eee;padding:8px 0;}
+    .cart-total{text-align:right;padding:8px 18px;font-weight:800;color:var(--accent);}
+    .cart-form{padding:10px 18px;display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+    .cart-form label{font-size:.86rem;color:#6a5746;}
+    .cart-form input,.cart-form select,.cart-form textarea{width:100%;padding:7px 9px;border:1px solid #ddd;border-radius:8px;font-size:.92rem;}
+    .cart-form textarea{grid-column:1/-1;}
+    .cart-actions{display:flex;gap:10px;justify-content:flex-end;padding:10px 18px;}
+    .btn-ghost{background:#e9e0d6;color:#4e3b2a;}
+    .btn-pay{background:#24a0ed;}
+  </style>
+</head>
+<body>
+<header>
+  <img src="https://i.postimg.cc/pdWV6Fsj/Screenshot-2025-10-23-alle-10-47-43.png" alt="Ninni's Cake">
+  <h1>Panettoni Artigianali</h1>
+  <p class="subtitle">Scopri i lievitati e le specialità firmate Ninni’s Cake</p>
+</header>
+
+<main id="catalog"></main>
+
+<div class="cart-fab" id="cartFab"><span>🛒</span><span class="count" id="cartCount">0</span></div>
+<div class="cart-overlay" id="cartOverlay"></div>
+
+<div class="cart-panel" id="cartPanel">
+  <div class="cart-head">
+    <strong>Il tuo carrello</strong>
+    <button id="closeCart" style="background:none;border:0;font-size:1.1rem;cursor:pointer;">✖</button>
+  </div>
+
+  <div id="cartBody" class="cart-body">Il carrello è vuoto.</div>
+  <div id="cartTotal" class="cart-total">Totale: 0 €</div>
+
+  <div class="cart-form">
+    <div>
+      <label for="name">Nome e Cognome</label>
+      <input type="text" id="name" placeholder="Mario Rossi">
+    </div>
+    <div>
+      <label for="email">E-mail</label>
+      <input type="email" id="email" placeholder="email@esempio.it">
+    </div>
+    <div>
+      <label for="phone">Cellulare</label>
+      <input type="tel" id="phone" placeholder="331...">
+    </div>
+    <div>
+      <label for="pickupDate">Data di Ritiro</label>
+      <input type="date" id="pickupDate">
+    </div>
+    <div style="grid-column:1/-1;">
+      <label for="pickupOpt">Opzioni Ritiro</label>
+      <select id="pickupOpt">
+        <option value="Ritiro in sede">Ritiro in sede</option>
+        <option value="Consegna a domicilio">Consegna a domicilio</option>
+      </select>
+    </div>
+    <div style="grid-column:1/-1;">
+      <label for="notes">Note o richieste particolari</label>
+      <textarea id="notes" rows="2" placeholder="Allergie, orari..."></textarea>
+    </div>
+  </div>
+
+  <div class="cart-actions">
+    <button class="btn-ghost" id="clearCart">Svuota</button>
+    <button class="btn" id="confirmOrder">Conferma Ordine</button>
+    <button class="btn btn-pay" id="payButton">Procedi al pagamento</button>
+  </div>
+</div>
+
+<footer>Laboratorio di Pasticceria Ninni's Cake — Via Risorgimento 48, Bernareggio (MB) 20881 — 📞 335 6318570</footer>
+
+<script>
+const WEBAPP_URL = "https://script.google.com/macros/s/AKfycbyjYqXIPd1yZLvwr2T2RMEeHanYCmgPG6XHsgp-R76pXoy9gc43XxCtK2np2rwMeFKL/exec";
+
+const catalog=document.getElementById('catalog');
+const cart=[], cartPanel=document.getElementById('cartPanel'), cartOverlay=document.getElementById('cartOverlay');
+const cartBody=document.getElementById('cartBody'), cartTotal=document.getElementById('cartTotal'), cartCount=document.getElementById('cartCount');
+
+const products=[
+  {name:"Panettone Classico Argento Vivo",desc:"Panettone dalle note fragranti del lievito madre con intensa profumazione di agrumi di Sicilia, canditi freschi, uvetta e vaniglia Bourbon del Madagascar. Lievitazione naturale 36h.",price750:32,price1:40,price15:70,img:"https://i.postimg.cc/RZw6nkf0/Classico.png"},
+  {name:"Panettone al Pistacchio",desc:"Panettone con crema di Pistacchio di Bronte e bacche di vaniglia del Madagascar, rifinito con glassa al cioccolato bianco e granella di pistacchio. Lievitazione naturale 36h.",price750:37,price1:45,price15:78,img:"https://i.postimg.cc/gkF6kcX6/Pistacchio.png"},
+  {name:"Panettone Rocher",desc:"Panettone con crema gianduia fondente, perline croccanti e glassa Rocher con granella di nocciole del Piemonte. Lievitazione naturale 36h.",price750:37,price1:45,price15:78,img:"https://i.postimg.cc/L6pnFywb/Rocher.png"},
+  {name:"Panettone Limone e Zenzero",desc:"Panettone con intensa profumazione di Limone di Sicilia, cubetti di Limone e Zenzero candito, glassa al cioccolato bianco. Lievitazione naturale 36h.",price750:37,price1:45,price15:78,img:"https://i.postimg.cc/Y21CR60R/Limone-e-Zenzero.png"},
+  {name:"Panettone Marron Glacé e Cioccolato Fondente",desc:"Panettone con marroni del Piemonte e cioccolato fondente, glassa fondente e perline Valrhona. Lievitazione naturale 36h.",price750:40,price1:50,price15:87,img:"https://i.postimg.cc/L692VGrY/Marroni.png"},
+  {name:"Panettone Arancia, Peperoncino e Cioccolato Fondente",desc:"Panettone con arancia, peperoncino e cioccolato fondente, equilibrato e aromatico. Lievitazione naturale 36h.",price750:37,price1:45,price15:78,img:"https://i.postimg.cc/tTN8Z4Rh/Arancia-e-peperoncino.png"},
+  {name:"Cioccolato e Pralineria",desc:"Selezione artigianale di cioccolatini e praline assortite — 12 € all’etto.",price750:12,img:"https://i.postimg.cc/y8bYMMwb/Cioccolato-e-Pralineria.png"},
+  {name:"Panettone Gastronomico Monti (salumi vari)",desc:"Panettone salato con lievito madre e farcitura di salumi selezionati. Peso netto: circa 1kg–1,2kg.",price1:45,img:"https://i.postimg.cc/1tPx2M3S/Panettone-Gastronomico-Monti.png"},
+  {name:"Panettone Gastronomico Mare (pesce affumicato)",desc:"Panettone salato con farcitura di pesce affumicato. Peso netto: circa 1kg–1,2kg.",price1:90,img:"https://i.postimg.cc/rpX7RgWc/Panettone-Gastronomico-Mare.png"}
+];
+
+products.forEach(p=>{
+  const card=document.createElement('div');card.className='card';
+  const basePrice=p.name==="Cioccolato e Pralineria" ? "12 € all’etto"
+                   : p.name.startsWith("Panettone Gastronomico") ? `${p.price1} € al pezzo`
+                   : `da ${p.price750||p.price1||0} €`;
+  let selectHTML='';
+  if(!p.name.startsWith('Panettone Gastronomico') && p.name!=='Cioccolato e Pralineria'){
+    selectHTML=`<select>
+      <option value="750g">750 g — ${p.price750} €</option>
+      <option value="1kg" selected>1 kg — ${p.price1} €</option>
+      <option value="1.5kg">1,5 kg — ${p.price15} €</option>
+    </select>`;
+  } else if(p.name==='Cioccolato e Pralineria'){
+    selectHTML=`<select>
+      <option value="1 persona">Scatola per 1 Persona</option>
+      ${Array.from({length:9},(_,i)=>`<option value="${i+2} persone">Scatola per ${i+2} Persone</option>`).join('')}
+    </select>`;
+  }
+  card.innerHTML=`<img src="${p.img}" alt="${p.name}"><div class="meta"><h3>${p.name}</h3><span class="price-badge">${basePrice}</span><p class="desc">${p.desc}</p><div class="controls">${selectHTML}<input type="number" min="1" value="1"><button class="btn add-btn">Aggiungi</button></div></div>`;
+  catalog.appendChild(card);
+});
+
+function updateCart(){
+  if(cart.length===0){cartBody.innerHTML='Il carrello è vuoto.';cartTotal.textContent='Totale: 0 €';cartCount.textContent='0';return;}
+  let total=0;cartBody.innerHTML='';
+  cart.forEach((it)=>{const sub=it.price*it.qty;total+=sub;cartBody.innerHTML+=`<div class="cart-item"><div>${it.qty}x ${it.name}${it.size?` (${it.size})`:''}</div><div>${sub.toFixed(2)} €</div></div>`;});
+  cartTotal.textContent=`Totale: ${total.toFixed(2)} €`;cartCount.textContent=cart.length;
+}
+
+document.addEventListener('click',e=>{
+  if(e.target.classList.contains('add-btn')){
+    const c=e.target.closest('.card'); const n=c.querySelector('h3').textContent;
+    const q=parseInt(c.querySelector('input').value)||1; const s=c.querySelector('select')?c.querySelector('select').value:'';
+    const p=products.find(x=>x.name===n);
+    let price=(s==='750g')?p.price750:(s==='1.5kg'?p.price15:(p.price1||p.price750));
+    const ex=cart.find(x=>x.name===n && x.size===s);
+    if(ex) ex.qty+=q; else cart.push({name:n,size:s,qty:q,price,img:p.img});
+    updateCart();
+  }
+});
+
+document.getElementById('cartFab').onclick=()=>{cartPanel.classList.add('open');cartOverlay.classList.add('open');};
+document.getElementById('closeCart').onclick=()=>{cartPanel.classList.remove('open');cartOverlay.classList.remove('open');};
+cartOverlay.onclick=()=>{cartPanel.classList.remove('open');cartOverlay.classList.remove('open');};
+document.getElementById('clearCart').onclick=()=>{cart.length=0;updateCart();};
+
+// Conferma Ordine (usa i campi del form nel carrello)
+document.getElementById('confirmOrder').onclick=async()=>{
+  if(cart.length===0){alert('Il carrello è vuoto.');return;}
+  const name=document.getElementById('name').value.trim();
+  const email=document.getElementById('email').value.trim();
+  const phone=document.getElementById('phone').value.trim();
+  const pickupDate=document.getElementById('pickupDate').value;
+  const pickupOpt=document.getElementById('pickupOpt').value;
+  const notes=document.getElementById('notes').value;
+  if(!name||!email){alert('Inserisci Nome e Email.');return;}
+  try{
+    const res=await fetch(WEBAPP_URL,{method:'POST',body:JSON.stringify({name,email,phone,pickupDate,pickupOpt,notes,items:cart})});
+    const data=await res.json();
+    if(data.success){alert('Ordine inviato!');cart.length=0;updateCart();window.location.href='thankyou.html?order='+(data.orderNumber||'');}
+    else alert('Errore: '+(data.error||'sconosciuto'));
+  }catch(e){alert('Errore rete.');}
+};
+
+// Pagamento Stripe Checkout (Apple Pay / Google Pay / Carta / PayPal*)
+document.getElementById('payButton').onclick=async()=>{
+  if(cart.length===0){alert('Il carrello è vuoto.');return;}
+  const email=document.getElementById('email').value.trim();
+  if(!email){alert('Inserisci la tua email (per ricevuta).');return;}
+  const total=cart.reduce((s,i)=>s+i.price*i.qty,0);
+  try{
+    const res=await fetch(WEBAPP_URL+'?action=createCheckout',{method:'POST',body:JSON.stringify({items:cart,total,customer_email:email})});
+    const data=await res.json();
+    if(data.url) window.location.href=data.url; else alert('Errore creazione pagamento.');
+  }catch(e){alert('Errore connessione pagamento.');}
+};
+</script>
+</body>
+</html>
